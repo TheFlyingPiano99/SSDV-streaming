@@ -26,7 +26,6 @@ def decode(quality, binary):
         stdin=subp.PIPE, stdout=subp.PIPE, stderr=None)
     (stdout, stderr) = process.communicate(input=binary)
     img = Image.open(stdout)
-    bytes_io = BytesIO()
     return img
 
 
