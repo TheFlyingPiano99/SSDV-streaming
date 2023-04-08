@@ -1,4 +1,3 @@
-
 /* SSDV - Slow Scan Digital Video                                        */
 /*=======================================================================*/
 /* Copyright 2011-2016 Philip Heron <phil@sanslogic.co.uk>               */

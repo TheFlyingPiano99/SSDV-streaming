@@ -1,0 +1,46 @@
+ _______________
+|               |
+|     HELP      |
+|_______________|
+
+
+-e Encode JPEG to SSDV packets.
+-d Decode SSDV packets to JPEG.
+
+-n Encode packets with no FEC. (forward error correction)
+-t For testing, drops the specified percentage of packets while decoding.
+-c Set the callign. Accepts A-Z 0-9 and space, up to 6 characters.
+-i Set the image ID (0-255).
+-q Set the JPEG quality level (0 to 7, defaults to 4).
+-l Set packet length in bytes (max: 256, default 256).
+-v Print data for each packet decoded.
+
+
+----------------------------------------------------------------------
+
+ _______________
+|               |
+|   FROM FILE   |
+|_______________|
+
+
+ENCODING
+ssdv -e -c HA5KFU -i 1 -q 5 ./resources/image.jpeg ./resources/encoded.bin
+
+DECODING
+ssdv -d -q 5 ./resources/encoded.bin ./resources/output.jpeg
+
+
+----------------------------------------------------------------------
+
+ _______________
+|               |
+|  FROM STREAM  |
+|_______________|
+
+
+ENCODING
+ssdv -e -c HA5KFU -i 1 -q 5
+
+DECODING
+ssdv -d -q 5 ./resources/encoded.bin ./resources/output.jpeg
