@@ -9,11 +9,9 @@ def encode(callsign : str, img_id : int, quality : int, img : Image):
     bytes_io.seek(0)
     process = subp.Popen(
         args=["ssdv.exe", "-e", "-c", callsign, "-i", str(img_id), "-q", str(quality)],
-        stdin=subp.PIPE, stdout=subp.PIPE, stderr=None, bufsize=-1)
+        stdin=subp.PIPE, stdout=subp.PIPE, bufsize=-1)
     (stdout, stderr) = process.communicate(input=bytes_io.getvalue())
-
-
-    return ""
+    return stdout
 
 
 def decode(quality, binary):
@@ -50,7 +48,7 @@ def main():
             in_binary = open(binary_path, mode='rb')
             out_img = decode(in_binary)
             in_binary.close()
-            out_img.save(out_img_path)
+            out_img.save(out_img_path, format='JPEG')
         except Exception as e:
             print("Decoding image has failed!")
             print(e)
