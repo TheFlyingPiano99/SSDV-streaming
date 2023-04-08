@@ -3,6 +3,9 @@ from PIL import Image
 from io import BytesIO, StringIO
 
 
+"""
+Function working only with streams
+"""
 def encode(callsign : str, img_id : int, quality : int, img : Image):    
     bytes_io = BytesIO()
     img.save(bytes_io, format='JPEG')
@@ -14,6 +17,9 @@ def encode(callsign : str, img_id : int, quality : int, img : Image):
     return stdout
 
 
+"""
+Function working only with streams
+"""
 def decode(quality, binary):
     process = subp.Popen(
         args=["ssdv.exe", "-d", "-q", str(quality)],
@@ -28,7 +34,7 @@ def main():
     callsign = "HA5KFU"
     img_id = 1
     quality = 5
-    src_img_path = "./resources/image.jpeg"
+    src_img_path = "./resources/input.jpeg"
     binary_path = "./resources/encoded.bin"
     out_img_path = "./resources/output.jpeg"
     is_encode = True
