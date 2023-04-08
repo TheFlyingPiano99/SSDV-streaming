@@ -1,12 +1,33 @@
 import subprocess as subp
 from PIL import Image
-from io import BytesIO, StringIO
+from io import BytesIO
+
+max_size = 4080
+atomic_size = 16
+
+def correct_size(img : Image):
+    width, height = img.size
+    width = (width // atomic_size) * atomic_size
+    height = (height // atomic_size) * atomic_size
+    if width > max_size:
+        width = max_size
+    if height > max_size:
+        height = max_size
+    return img.resize((width, height), resample=Image.BILINEAR)
+
+
+def correct_palete(img : Image):
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
+    return img
 
 
 """
 Function working only with streams
 """
-def encode(callsign : str, img_id : int, quality : int, img : Image):    
+def encode(callsign : str, img_id : int, quality : int, img : Image):
+    img = correct_size(img)
+    img = correct_palete(img)
     bytes_io = BytesIO()
     img.save(bytes_io, format='JPEG')
     bytes_io.seek(0)
@@ -39,7 +60,7 @@ def main():
     binary_path = "./resources/encoded.bin"
     out_img_path = "./resources/output.jpeg"
     is_encode = True
-    
+
     if is_encode:
         try:
             img : Image = Image.open(src_img_path, mode='r')
