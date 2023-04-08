@@ -24,7 +24,9 @@ def decode(quality, binary):
     process = subp.Popen(
         args=["ssdv.exe", "-d", "-q", str(quality)],
         stdin=subp.PIPE, stdout=subp.PIPE, stderr=None)
-    img = Image.open(process.stdout)
+    (stdout, stderr) = process.communicate(input=binary)
+    img = Image.open(stdout)
+    bytes_io = BytesIO()
     return img
 
 
@@ -52,7 +54,7 @@ def main():
     else:
         try:
             in_binary = open(binary_path, mode='rb')
-            out_img = decode(in_binary)
+            out_img = decode(quality, in_binary)
             in_binary.close()
             out_img.save(out_img_path, format='JPEG')
         except Exception as e:
