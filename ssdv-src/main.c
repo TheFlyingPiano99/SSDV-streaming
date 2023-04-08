@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 		case '?': exit_usage();
 		}
 	}
-	
+
 	c = argc - optind;
 	if(c > 2) exit_usage();
 	
