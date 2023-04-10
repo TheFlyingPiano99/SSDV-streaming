@@ -28,26 +28,26 @@ Function working only with streams
 def encode(callsign : str, img_id : int, quality : int, img : Image):
     img = correct_size(img)
     img = correct_palete(img)
-    bytes_io = BytesIO()
-    img.save(bytes_io, format='JPEG')
-    bytes_io.seek(0)
-    process = subp.Popen(
-        args=["ssdv.exe", "-e", "-c", callsign, "-i", str(img_id), "-q", str(quality)],
-        stdin=subp.PIPE, stdout=subp.PIPE, bufsize=-1)
-    (stdout, stderr) = process.communicate(input=bytes_io.getvalue())
-    return stdout
-
+    with BytesIO() as bytes_io:
+        img.save(bytes_io, format='JPEG')
+        # bytes_io.seek(0)
+        process = subp.Popen(
+            args=["ssdv", "-e", "-c", callsign, "-i", str(img_id), "-q", str(quality)],
+            stdin=subp.PIPE, stdout=subp.PIPE, bufsize=-1)
+        (stdout, stderr) = process.communicate(input=bytes_io.getvalue())
+        return BytesIO(stdout)
+    pass
 
 """
 Function working only with streams
 """
-def decode(quality, binary):
+def decode(quality : int, bytes_io : BytesIO):
     process = subp.Popen(
-        args=["ssdv.exe", "-d", "-q", str(quality)],
+        args=["ssdv", "-d", "-q", str(quality)],
         stdin=subp.PIPE, stdout=subp.PIPE, stderr=None)
-    (stdout, stderr) = process.communicate(input=binary)
-    img = Image.open(stdout)
-    return img
+    (stdout, stderr) = process.communicate(input=bytes_io.getvalue())
+    bytes_io.close()
+    return Image.open(BytesIO(stdout))
 
 
 def main():
@@ -56,30 +56,29 @@ def main():
     callsign = "HA5KFU"
     img_id = 1
     quality = 5
-    src_img_path = "./resources/input.jpeg"
+    src_img_path = "./resources/input.png"
     binary_path = "./resources/encoded.bin"
     out_img_path = "./resources/output.jpeg"
     is_encode = True
 
     if is_encode:
         try:
-            img : Image = Image.open(src_img_path, mode='r')
-            out_binary = encode(callsign, img_id, quality, img)
-            out_file = open(binary_path, mode='wb')
-            out_file.write(out_binary)
-            out_file.close()
+            with Image.open(src_img_path, mode='r') as img, \
+            encode(callsign, img_id, quality, img) as bytes_io, \
+            open(binary_path, mode='wb') as out_file:
+                out_file.write(bytes_io.getvalue())
+            print("Encoding succeeded")
         except Exception as e:
-            print("Encoding image has failed!")
-            print(e)
+            print("Encoding image has failed!", e)
     else:
         try:
-            in_binary = open(binary_path, mode='rb')
-            out_img = decode(quality, in_binary)
-            in_binary.close()
-            out_img.save(out_img_path, format='JPEG')
+            with open(binary_path, mode='rb') as in_binary, \
+            BytesIO(in_binary.read()) as bytes_io, \
+            decode(quality, bytes_io) as image:
+                image.save(out_img_path)
+            print("Decoding succeeded")
         except Exception as e:
-            print("Decoding image has failed!")
-            print(e)
+            print("Decoding image has failed!", e)
 
 if __name__ == "__main__":
     main()

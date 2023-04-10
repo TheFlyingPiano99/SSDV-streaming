@@ -4,6 +4,7 @@ ssdv
 *.jpeg
 *.bin*
 *.jpg
+*.png
 
 .vscode
 .vs
