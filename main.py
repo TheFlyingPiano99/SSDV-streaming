@@ -1,6 +1,7 @@
 import subprocess as subp
 from PIL import Image
 from io import BytesIO
+import os
 
 max_size = 4080
 atomic_size = 16
@@ -32,7 +33,7 @@ def encode(callsign : str, img_id : int, quality : int, img : Image):
         img.save(bytes_io, format='JPEG')
         # bytes_io.seek(0)
         process = subp.Popen(
-            args=["ssdv", "-e", "-c", callsign, "-i", str(img_id), "-q", str(quality)],
+            args=["./ssdv", "-e", "-c", callsign, "-i", str(img_id), "-q", str(quality)],
             stdin=subp.PIPE, stdout=subp.PIPE, bufsize=-1)
         (stdout, stderr) = process.communicate(input=bytes_io.getvalue())
         return BytesIO(stdout)
@@ -43,7 +44,7 @@ Function working only with streams
 """
 def decode(quality : int, bytes_io : BytesIO):
     process = subp.Popen(
-        args=["ssdv", "-d", "-q", str(quality)],
+        args=["./ssdv", "-d", "-q", str(quality)],
         stdin=subp.PIPE, stdout=subp.PIPE, stderr=None)
     (stdout, stderr) = process.communicate(input=bytes_io.getvalue())
     bytes_io.close()
@@ -51,6 +52,7 @@ def decode(quality : int, bytes_io : BytesIO):
 
 
 def main():
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     print("SSDV streaming test application")
     
     callsign = "HA5KFU"
@@ -59,7 +61,7 @@ def main():
     src_img_path = "./resources/input.png"
     binary_path = "./resources/encoded.bin"
     out_img_path = "./resources/output.jpeg"
-    is_encode = True
+    is_encode = False
 
     if is_encode:
         try:
